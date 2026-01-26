@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Ricerca Genere</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+<body>
+    <nav class="navbar">
+        <ul class="nav-list">
+            <li><a href="/user">Home</a></li>
+            <li><a href="/user">Indietro</a></li>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Contact</a></li>
+            <li><a href="#">Structure</a></li>
+            <>
+        </ul>
+        <ul class="nav-actions">
+            <!-- Bottone di Logout -->
+            <li>
+                <form action="/logout" method="POST">
+                    <button class="logout-btn">Logout</button>
+                </form>
+            </li>
+        </ul>
+    </nav>
+
+    <h1>🔍 Cerca un film per genere</h1>
+
+    <form method="POST">
+        <input type="text" name="genere" placeholder="Es. Horror, Action" required>
+        <button type="submit">Cerca</button>
+    </form>
+
+    {% if risultati is not none %}
+        {% if risultati %}
+            <h2>🎬 Risultati trovati:</h2>
+            <ul>
+                {% for film in risultati %}
+                    <li>
+                        <strong>{{ film.title }}</strong><br>
+                        Generi: {{ film.genres }}<br>
+                        Rating medio: {{ film.average_rating }}<br>
+                        Voti: {{ film.num_ratings }}<br>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>❌ Nessun film trovato con questo genere.</p>
+        {% endif %}
+    {% endif %}
+</body>
+</html>

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community degli Utenti</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="user-community-container">
+        <h1 class="user-community-title">Community degli Utenti</h1>
+        <p class="user-community-description">
+            Il grafo rappresenta la community degli utenti basata sulla somiglianza dei preferiti.
+        </p>
+        <img src="{{ url_for('static', filename='images/user_community_graph.png') }}" alt="Grafo della Community" class="user-community-graph">
+        <a href="/user" class="user-community-btn-back">Torna alla Home</a>
+    </div>
+</body>
+</html>

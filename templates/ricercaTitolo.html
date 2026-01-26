@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Ricerca Film per Descrizione</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <ul class="nav-list">
+            <li><a href="/user">Home</a></li>
+        </ul>
+        <ul class="nav-actions">
+            <li>
+                <form action="/logout" method="POST">
+                    <button class="logout-btn">Logout</button>
+                </form>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="preference-form-page">
+        <h2>🔍 Cerca un film per titolo</h2>
+        <form action='/ricercaTitolo' method="GET">
+            <input type="text" name="titolo" placeholder="Cerca per titolo..." class="navbar-search-input" required>
+            <button type="submit">Cerca</button>
+        </form>
+    </div>
+
+    <div class="raccomandazioni">
+        <h3>Risultati della Ricerca</h3>
+        <ul class="film-raccomandati">
+            {% if risultati %}
+                {% for film in risultati %}
+                    <li>
+                        <a href="/descrizione/{{ film.movieId }}">
+                            <img src="{{ film.url }}" alt="Poster di {{ film.title }}">
+                        </a>
+                        <div class="user-film-info">
+                            <span class="titolo-film">{{ film.title }}</span>
+                            <span class="genere-film">{{ film.genres }}</span>
+                        </div>
+                    </li>
+                {% endfor %}
+            {% else %}
+                <li><i>Nessun film trovato con questa descrizione.</i></li>
+            {% endif %}
+        </ul>
+    </div>
+</body>
+</html>

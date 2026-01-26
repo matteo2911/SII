@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profilo Utente</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <ul class="nav-list">
+            <li><a href="/user">Home</a></li>       
+        </ul>
+        <ul class="nav-actions">
+            <li>
+                <form action="/logout" method="POST">
+                    <button class="logout-btn">Logout</button>
+                </form>
+            </li>
+        </ul>
+    </nav>
+
+    <main>
+        <!-- Informazioni personali -->
+        <section class="user-info">
+            <h2>Informazioni personali</h2>
+            <div class="info-card">
+                <p><strong>Nome:</strong> {{ user.nome }}</p>
+                <p><strong>Cognome:</strong> {{ user.cognome }}</p>
+                <p><strong>Email:</strong> {{ user.email }}</p>
+            </div>
+        </section>
+
+        <!-- Preferenze -->
+        <section class="user-preferences">
+            <h2>Le tue preferenze</h2>
+
+            <!-- Generi preferiti -->
+        <div class="preference-section">
+            <h3>Generi preferiti</h3>
+            <form action="/form_preferenze_genere" method="get" class="form-preferenze">
+                <button type="submit" class="btn-aggiungi">Modifica Generi Preferiti</button>
+            </form>
+            {% if user.preferiti.generi %}
+                <ul>
+                    {% for genere in user.preferiti.generi %}
+                        <li>{{ genere }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>Nessun genere preferito aggiunto</p>
+            {% endif %}
+        </div>
+
+        <!-- Film preferiti -->
+        <div class="preference-section">
+            <h3>Film Preferiti</h3>
+            <form action="/form_preferenze_film" method="get" class="form-preferenze">
+                <button type="submit" class="btn-aggiungi">Aggiungi un Film Preferito</button>
+            </form>
+            <ul class="film-preferiti-list">
+                {% for film in filmPreferiti %}
+                    <li class="film-preferito-item">
+                        <div class="profile-film-info">
+                            <span class="titolo-film">{{ film.title }}</span>
+                            <form action="/rimuoviFilmPreferito" method="POST" class="form-rimuovi">
+                                <input type="hidden" name="film_id" value="{{ film.movieId }}">
+                                <button type="submit" class="btn-rimuovi">Rimuovi</button>
+                            </form>
+                        </div>
+                    </li>
+                {% else %}
+                    <li class="nessun-film-preferito">
+                        <i>Non hai film preferiti.</i>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Registi preferiti -->
+        <div class="preference-section">
+            <h3>Registi preferiti</h3>
+            <form action="/form_preferenze_registi" method="get" class="form-preferenze">
+                <button type="submit" class="btn-aggiungi">Aggiungi Registi Preferiti</button>
+            </form>
+            {% if registiPreferiti %}
+                <ul>
+                    {% for regista in registiPreferiti %}
+                        <li class="film-preferito-item">
+                            <div class="profile-film-info">
+                                <span class="titolo-film">{{ regista.nome }}</span>
+                                <form action="/rimuoviRegistaPreferito" method="POST" class="form-rimuovi">
+                                    <input type="hidden" name="regista_id" value="{{ regista.id_regista }}">
+                                    <button type="submit" class="btn-rimuovi">Rimuovi</button>
+                                </form>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>Non hai registi preferiti.</p>
+            {% endif %}
+        </div>
+
+        <!-- Attori preferiti -->
+        <div class="preference-section">
+            <h3>Attori preferiti</h3>
+            <form action="/form_preferenze_attori" method="get" class="form-preferenze">
+                <button type="submit" class="btn-aggiungi">Aggiungi Attori Preferiti</button>
+            </form>
+            {% if attoriPreferiti %}
+                <ul>
+                    {% for attore in attoriPreferiti %}
+                        <li class="film-preferito-item">
+                            <div class="profile-film-info">
+                                <span class="titolo-film">{{ attore.nome }}</span>
+                                <form action="/rimuoviAttorePreferito" method="POST" class="form-rimuovi">
+                                    <input type="hidden" name="attore_id" value="{{ attore.id_attore }}">
+                                    <button type="submit" class="btn-rimuovi">Rimuovi</button>
+                                </form>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>Non hai attori preferiti.</p>
+            {% endif %}
+        </div>
+
+        <!-- Film Valutati -->
+        <div class="preference-section">
+            <h3>Film Valutati</h3>
+            <form action="/valuta_film" method="get" class="form-preferenze">
+                <button type="submit" class="btn-aggiungi">Valuta un Film</button>
+            </form>
+            <ul class="rating-list">
+                {% for row in filmValutati %}
+                    <li class="rating-item">
+                        <div class="profile-film-info">
+                            <span class="titolo-film">{{ row.title }}</span>
+                            <span class="rating-stars">
+                                {% for i in range(1, 6) %}
+                                    {% if i <= row.RatingUtente.rating %}
+                                        <span class="star filled">★</span>
+                                    {% else %}
+                                        <span class="star">☆</span>
+                                    {% endif %}
+                                {% endfor %}
+                            </span>
+                            <form action="/rimuoviRating" method="POST" class="form-rimuovi">
+                                <input type="hidden" name="film_id" value="{{ row.movieId }}">
+                                <button type="submit" class="btn-rimuovi">Rimuovi</button>
+                            </form>
+                        </div>
+                    </li>
+                {% else %}
+                    <li class="nessuna-valutazione">
+                        <i>Nessun film valutato</i>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </main>
+</body>
+</html>

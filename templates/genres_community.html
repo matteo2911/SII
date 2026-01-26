@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community dei Generi</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="genres-community-container">
+        <h1 class="genres-community-title">Community dei Generi</h1>
+        <p class="genres-community-description">
+            Il grafo rappresenta la community dei generi basata sulla somiglianza dei film.
+        </p>
+        <img src="{{ url_for('static', filename='images/genres_community_graph.png') }}" alt="Grafo della Community" class="genres-community-graph">
+        <a href="/user" class="genres-community-btn-back">Torna alla Home</a>
+    </div>
+</body>
+</html>
