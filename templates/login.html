@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="login-container">
+        <h2 class="login-title">Accedi al tuo Account</h2>
+        <form method="POST" action="/login" class="login-form">
+            <input type="email" name="email" placeholder="Email" class="login-input" required>
+            <input type="password" name="password" placeholder="Password" class="login-input" required>
+            <button type="submit" class="login-btn">Accedi</button>
+        </form>
+        <p class="login-footer">Non hai un account? <a href="/register" class="login-link">Registrati</a></p>
+    </div>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Valuta Film</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="valutazione-container">
+        <h2 class="valutazione-title">Valuta un Film</h2>
+        
+        <form method="GET" action="/valuta_film" class="valutazione-search-form">
+            <input type="text" name="title" placeholder="Cerca un film..." class="valutazione-search-input" required>
+            <button type="submit" class="valutazione-search-btn">Cerca</button>
+        </form>
+
+        {% if risultati %}
+            <div class="valutazione-risultati">
+                {% for film in risultati %}
+                    <div class="valutazione-film-item">
+                        <h3 class="valutazione-film-title">{{ film.title }} ({{ film.anno }})</h3>
+                        <form method="POST" action="/valuta_film" class="valutazione-rating-form">
+                            <input type="hidden" name="movie_id" value="{{ film.movieId }}">
+                            
+                            <div class="valutazione-rating-container">
+                                <div class="valutazione-rating-stars">
+                                    {% for i in range(5, 0, -1) %}
+                                        <input id="star{{i}}-{{film.movieId}}" type="radio" name="rating" value="{{i}}" class="valutazione-star-input">
+                                        <label for="star{{i}}-{{film.movieId}}" class="valutazione-star-label">★</label>
+                                    {% endfor %}
+                                </div>
+                                <button type="submit" class="valutazione-save-btn">Salva Valutazione</button>
+                            </div>
+                        </form>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>

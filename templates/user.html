@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Area Utente</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <ul class="nav-list">
+            <li><a href="/user">Home</a></li>
+            <li><a href="/search_description_page">Ricerca Semantica</a></li>
+            <li><a href="/profilo">Profile</a></li>
+            <li>
+                <form action="/esegui" method="post" class="struttura-form">
+                    <label for="scelta" class="struttura-label">Structures:</label>
+                    <select name="opzione" id="scelta" class="struttura-select" onchange="this.form.submit()">
+                        <option value="">Select</option>
+                        <option value="1">Utenti</option>
+                        <option value="2">Generi</option>
+                    </select>
+                </form>
+            </li>
+            <li>
+                <form action="/ricercaTitolo" method="GET" class="navbar-search-form">
+                    <input type="text" name="titolo" placeholder="Cerca per titolo..." class="navbar-search-input" required>
+                    <button type="submit" class="navbar-search-btn">Cerca</button>
+                </form>
+            </li>
+            
+        </ul>
+        <ul class="nav-actions">
+            <li>
+                <form action="/logout" method="POST">
+                    <button class="logout-btn">Logout</button>
+                </form>
+            </li>
+        </ul>
+    </nav>
+    
+    <!-- Raccomandazioni -->
+    <div class="raccomandazioni">
+        <h3>Film Raccomandati per i tuoi Generi Preferiti</h3>
+        <ul class="film-raccomandati">
+            {% if film_raccomandati_genere %}
+                {% for film in film_raccomandati_genere %}
+                    <li>
+                        <a href="/descrizione/{{ film.movieId }}">
+                            <img src="{{ film.url }}" alt="Poster di {{ film.title }}">
+                        </a>
+                        <div class="user-film-info">
+                            <span class="titolo-film">{{ film.title }}</span>
+                            <span class="genere-film">
+                                {% for genere in film.generi %}
+                                    {{ genere.nome }}{% if not loop.last %}, {% endif %}
+                                {% endfor %}
+                            </span>
+                            <span class="popolarita-film">Popolarità: {{ film.popolarita }}</span>
+                        </div>
+                    </li>
+                {% endfor %}
+            {% else %}
+                <li><i>Nessun film raccomandato trovato.</i></li>
+            {% endif %}
+        </ul>
+    </div>
+
+    <div class="raccomandazioni">
+        <h3>Film Raccomandati per i tuoi Registi Preferiti</h3>
+        <ul class="film-raccomandati">
+            {% if film_raccomandati_regista %}
+                {% for film in film_raccomandati_regista %}
+                    <li>
+                        <a href="/descrizione/{{ film.movieId }}">
+                            <img src="{{ film.url }}" alt="Poster di {{ film.title }}">
+                        </a>
+                        <div class="user-film-info">
+                            <span class="titolo-film">{{ film.title }}</span>
+                            <span class="genere-film">
+                                {% for genere in film.generi %}
+                                    {{ genere.nome }}{% if not loop.last %}, {% endif %}
+                                {% endfor %}
+                            </span>
+                            <span class="popolarita-film">Popolarità: {{ film.popolarita }}</span>
+                        </div>
+                    </li>
+                {% endfor %}
+            {% else %}
+                <li><i>Nessun film raccomandato trovato.</i></li>
+            {% endif %}
+        </ul>
+    </div>
+
+    <div class="raccomandazioni">
+        <h3>Film Raccomandati per i tuoi Attori Preferiti</h3>
+        <ul class="film-raccomandati">
+            {% if film_raccomandati_attore %}
+                {% for film in film_raccomandati_attore %}
+                    <li>
+                        <a href="/descrizione/{{ film.movieId }}">
+                            <img src="{{ film.url }}" alt="Poster di {{ film.title }}">
+                        </a>
+                        <div class="user-film-info">
+                            <span class="titolo-film">{{ film.title }}</span>
+                            <span class="genere-film">
+                                {% for genere in film.generi %}
+                                    {{ genere.nome }}{% if not loop.last %}, {% endif %}
+                                {% endfor %}
+                            </span>
+                            <span class="popolarita-film">Popolarità: {{ film.popolarita }}</span>
+                        </div>
+                    </li>
+                {% endfor %}
+            {% else %}
+                <li><i>Nessun film raccomandato trovato.</i></li>
+            {% endif %}
+        </ul>
+    </div>
+
+    <div class="raccomandazioni">
+        <h3>Film Raccomandati per i tuoi Film Preferiti</h3>
+        <ul class="film-raccomandati"> 
+            {% if film_raccomandati_film %}
+                {% for film in film_raccomandati_film %}
+                    <li>
+                        <a href="/descrizione/{{ film.movieId }}">
+                            <img src="{{ film.url }}" alt="Poster di {{ film.title }}">
+                        </a>
+                        <div class="user-film-info">
+                            <span class="titolo-film">{{ film.title }}</span>
+                            <span class="genere-film">
+                                {% for genere in film.generi %}
+                                    {{ genere.nome }}{% if not loop.last %}, {% endif %}
+                                {% endfor %}
+                            </span>
+                            <span class="popolarita-film">Popolarità: {{ film.popolarita }}</span>
+                        </div>
+                    </li>
+                {% endfor %}
+            {% else %}
+                <li><i>Nessun film raccomandato trovato.</i></li>
+            {% endif %}
+        </ul>
+    </div>
+
+
+    <div class="raccomandazioni">
+    <h3>Consigliati per Te (Raccomandazione Collaborativa)</h3>
+        <ul class="film-raccomandati">
+            {% if film_raccomandati_collaborativi %}
+                {% for film in film_raccomandati_collaborativi %}
+                    <li>
+                        <a href="/descrizione/{{ film.movieId }}">
+                            <img src="{{ film.url }}" alt="Poster di {{ film.title }}">
+                        </a>
+                        <div class="user-film-info">
+                            <span class="titolo-film">{{ film.title }}</span>
+                            <span class="genere-film">
+                                {% for genere in film.generi %}
+                                    {{ genere.nome }}{% if not loop.last %}, {% endif %}
+                                {% endfor %}
+                            </span>
+                            <span class="popolarita-film">Popolarità: {{ film.popolarita }}</span>
+                        </div>
+                    </li>
+                {% endfor %}
+            {% else %}
+                <li><i>Nessun film raccomandato trovato.</i></li>
+            {% endif %}
+        </ul>
+    </div>
+
+    <div class="raccomandazioni">
+    <h3>Consigliati per Te (Raccomandazione Ibrida)</h3>
+        <ul class="film-raccomandati">
+            {% if film_raccomandati_ibridi %}
+                {% for film in film_raccomandati_ibridi %}
+                    <li>
+                        <a href="/descrizione/{{ film.movieId }}">
+                            <img src="{{ film.url }}" alt="Poster di {{ film.title }}">
+                        </a>
+                        <div class="user-film-info">
+                            <span class="titolo-film">{{ film.title }}</span>
+                            <span class="genere-film">
+                                {% for genere in film.generi %}
+                                    {{ genere.nome }}{% if not loop.last %}, {% endif %}
+                                {% endfor %}
+                            </span>
+                            <span class="popolarita-film">Popolarità: {{ film.popolarita }}</span>
+                        </div>
+                    </li>
+                {% endfor %}
+            {% else %}
+                <li><i>Nessun film raccomandato trovato.</i></li>
+            {% endif %}
+        </ul>
+    </div>
+
+
+</body>
+</html>

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Preferenze Generi</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="preference-genere-page">
+        <h1>Scegli i tuoi generi preferiti 🎬</h1>
+        <form method="POST">
+            <div class="checkbox-group">
+                {% for genere in generi_disponibili %}
+                    <label>
+                        <input type="checkbox" name="generi" value="{{ genere }}"
+                        {% if genere in generi_selezionati %} checked {% endif %}>
+                        {{ genere }}
+                    </label>
+                {% endfor %}
+            </div>
+            <button type="submit">Salva preferenze</button>
+        </form>
+
+        {% if messaggio %}
+            <div class="message">{{ messaggio }}</div>
+        {% endif %}
+    </div>
+</body>
+</html>

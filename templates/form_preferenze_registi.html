@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Ricerca Registi Preferiti</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="preference-form-page">
+        <h2>Ricerca Registi Preferiti</h2>
+        <form method="GET" action="/ricercaRegista">
+            <input type="text" name="nome" placeholder="Cerca un regista..." required>
+            <button type="submit">Cerca</button>
+        </form>
+
+        {% if risultati %}
+            {% for regista in risultati %}
+                <div class="film-entry">
+                    <span class="title">{{ regista.nome }}</span>
+                    <form method="post" action="/aggiungiRegistaPreferito">
+                        <input type="hidden" name="regista_id" value="{{ regista.id_regista }}">
+                        <button type="submit">+</button>
+                    </form>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+</body>
+</html>

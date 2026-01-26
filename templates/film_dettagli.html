@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Dettagli Film</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <!-- Dettagli Film -->
+    <div class="film-details-container">
+        <h1 class="film-details-title">{{ film.title }}</h1>
+        <div class="film-details-info">
+            <img src="{{ film.url }}" alt="Poster di {{ film.title }}" class="film-details-poster">
+            <div class="film-details-meta">
+                <p><strong>Anno:</strong> {{ film.anno }}</p>
+                <p><strong>Popolarità:</strong> {{ film.popolarita }}</p>
+                <p><strong>Media voti:</strong> {{ film.media_voto }}</p>
+                <p><strong>Descrizione:</strong> {{ film.descrizione }}</p>
+                <p><strong>Regista:</strong> {{ regista.nome if regista else "Non disponibile" }}</p>
+                <p><strong>Generi:</strong> 
+                    {% for genere in generi %}
+                        {{ genere.nome }}{% if not loop.last %}, {% endif %}
+                    {% endfor %}
+                </p>
+                <p><strong>Attori:</strong> 
+                    {% for attore in attori %}
+                        {{ attore.nome }}{% if not loop.last %}, {% endif %}
+                    {% endfor %}
+                </p>
+            </div>
+        </div>
+        <a href="/user" class="film-details-btn-back">Torna alla Home</a>
+    </div>
+</body>
+</html>

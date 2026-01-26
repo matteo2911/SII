@@ -31,7 +31,7 @@ def calcola_similarita(utente1, utente2):
     return somiglianza_totale
 
 
-def crea_community_utenti(db_session, soglia=0.6):
+def crea_community_utenti(db_session, soglia=0.05):
 
     # Recupera tutti gli utenti
     utenti = db_session.query(Utente).all()

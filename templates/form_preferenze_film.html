@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Ricerca Film Preferiti</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="preference-form-page">
+        <h2>Ricerca Film Preferiti</h2>
+        <form method="GET" action="/ricercaFilm">
+            <input type="text" name="title" placeholder="Cerca un film..." required>
+            <button type="submit">Cerca</button>
+        </form>
+
+        {% if risultati %}
+            {% for film in risultati %}
+                <div class="film-entry">
+                    <span class="title">{{ film.title }}</span>
+                    <form method="post" action="/aggiungiFilmPreferito">
+                        <input type="hidden" name="film_id" value="{{ film.movieId }}">
+                        <button type="submit">+</button>
+                    </form>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+</body>
+</html>
