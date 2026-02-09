@@ -53,7 +53,8 @@ def costruisci_profilo_utente_pesato(user_id, db_session):
     valutati = (
         db_session.query(Film, RatingUtente.rating)
         .join(RatingUtente, Film.movieId == RatingUtente.movie_id)
-        .filter(RatingUtente.utente_id == user_id)
+        .filter(RatingUtente.utente_id == user_id,
+                RatingUtente.rating >= 4)
         .all()
     )
     for film, rating in valutati:
