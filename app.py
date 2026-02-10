@@ -37,7 +37,7 @@ from flask import request, jsonify
 from sqlalchemy.orm import sessionmaker
 from database import db, Film
 from raccomandazione.raccomandazione_collaborativa import raccomanda_film_per_utente  
-
+from core.community_structure.Genres_community_Structure import genera_immagine_community_generi
 
 
 
@@ -715,7 +715,18 @@ def users_community():
 
 @app.route('/genres_community')
 def genres_community():
+    if 'user_id' not in session:
+        flash('Devi effettuare il login', 'warning')
+        return redirect('/login')
+
+    # Genera il grafo dei generi e salva l'immagine in static/images
+    genera_immagine_community_generi(
+        csv_path="data/movies.csv",
+        output_path="static/images/genres_community_graph.png"
+    )
+
     return render_template('genres_community.html')
+
 
 
 #--------------NLP SYSTEM---------------

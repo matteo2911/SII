@@ -1,76 +1,98 @@
+import itertools
 import networkx as nx
 import matplotlib.pyplot as plt
-import community as community_louvain  
 import pandas as pd
+import os
+import community.community_louvain as community_louvain
 
-# Carica  file CSV 
-CSV_FILE = 'data/movies.csv'  
+CSV_FILE = "data/movies.csv"
 
-# Funzione per caricare il CSV e ottenere le categorie
 def carica_dati_csv(file_csv):
-    # Carica il CSV in un DataFrame
     df = pd.read_csv(file_csv)
-    
-    # RestituiscE una lista di film e le loro categorie
     film_categorie = []
-    for _, row in df.iterrows():
-        categories = row['genres'].split('|')  
-        film_categorie.append(categories)
+    for genres in df["genres"].astype(str):
+        cats = [g for g in genres.split("|") if g and g != "(no genres listed)"]
+        if cats:
+            film_categorie.append(cats)
     return film_categorie
 
-# Funzione per creare il grafo delle categorie
-def crea_grafo(film_categorie):
+def crea_grafo_jaccard(film_categorie):
+    
+    genre_count = {}
+    cooc = {}
+
+    for cats in film_categorie:
+        cats = list(dict.fromkeys(cats))  # unique, preserve order
+        for g in cats:
+            genre_count[g] = genre_count.get(g, 0) + 1
+        for a, b in itertools.combinations(sorted(cats), 2):
+            cooc[(a, b)] = cooc.get((a, b), 0) + 1
+
+    
     G = nx.Graph()
+    for (a, b), c in cooc.items():
+        w = c / (genre_count[a] + genre_count[b] - c)
+        G.add_edge(a, b, weight=w, cooc=c)
 
-    # Aggiungi gli archi tra le categorie di ogni film
-    for categories in film_categorie:
-        for i in range(len(categories)):
-            for j in range(i + 1, len(categories)):
-                # Se due categorie co-occorrono nello stesso film, aggiungiamo un arco
-                if G.has_edge(categories[i], categories[j]):
-                    G[categories[i]][categories[j]]['weight'] += 1  # Aumentiamo il peso
-                else:
-                    G.add_edge(categories[i], categories[j], weight=1)  # Aggiungiamo un arco con peso 1
-    
-    return G
+    return G, genre_count
 
-# Funzione per rilevare le comunità con l'algoritmo Louvain
 def rileva_comunita(G):
-    # algoritmo di Louvain per rilevare le comunità
-    partition = community_louvain.best_partition(G)  
-    return partition
-
-# Funzione per salvare il grafo come immagine
-def salva_grafo(G, partition, filepath='static/images/genres_community_graph.png'):
-
-  
-    colori = ['yellow', 'skyblue', 'green']
-    comunità = set(partition.values())
     
-    pos = nx.spring_layout(G)  
+    return community_louvain.best_partition(G, weight="weight", random_state=42, resolution=1.0)
+
+def salva_grafo(G, partition, genre_count, filepath="static/images/genres_community_graph.png"):
+    
+    colori = ["skyblue", "green", "yellow", "orange", "purple", "pink", "red", "brown", "gray", "cyan"]
+
+
+    
+    pos = nx.spring_layout(G, seed=42)
+
     plt.figure(figsize=(12, 12))
+
     
-    
+    comunità = sorted(set(partition.values()))
     for i, com in enumerate(comunità):
-        nodes = [node for node in partition if partition[node] == com]
+        nodes = [n for n in partition if partition[n] == com]
         nx.draw_networkx_nodes(
-            G, pos, nodes, node_size=1400, node_color=[colori[i % len(colori)]] * len(nodes)  # Pallini più grandi
+            G, pos,
+            nodelist=nodes,
+            node_size=1400,
+            node_color=[colori[i % len(colori)]] * len(nodes)
         )
-    
-    nx.draw_networkx_edges(G, pos, alpha=0.5)
+
+    # --- ARCHI: tieni solo i più forti ---
+    TOP_K_PER_NODE = 4  
+
+    keep = set()
+    for n in G.nodes():
+        # prendo i vicini ordinati per peso (Jaccard) decrescente
+        vicini = sorted(G[n].items(), key=lambda x: x[1].get("weight", 0), reverse=True)[:TOP_K_PER_NODE]
+        for nb, _attr in vicini:
+            keep.add(tuple(sorted((n, nb))))
+
+    edgelist = list(keep)
+
+    nx.draw_networkx_edges(G, pos, edgelist=edgelist, alpha=0.5)
+
+    # etichette 
     nx.draw_networkx_labels(G, pos, font_size=12)
-    
+
     plt.title("Rete delle categorie dei film con le comunità", size=15)
-    plt.axis('off')
-    plt.savefig(filepath)  
-    plt.close()  
+    plt.axis("off")
+    plt.savefig(filepath, bbox_inches="tight")
+    plt.close()
 
-# Main
-def main():
-    film_categorie = carica_dati_csv(CSV_FILE)
-    G = crea_grafo(film_categorie)
+
+def genera_immagine_community_generi(
+    csv_path=CSV_FILE,
+    output_path="static/images/genres_community_graph.png"
+):
+    film_categorie = carica_dati_csv(csv_path)
+    G, genre_count = crea_grafo_jaccard(film_categorie)
     partition = rileva_comunita(G)
-    salva_grafo(G, partition)  
 
-if __name__ == '__main__':
-    main()
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    salva_grafo(G, partition, genre_count, filepath=output_path)
+
+    return output_path
