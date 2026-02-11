@@ -38,6 +38,7 @@ from sqlalchemy.orm import sessionmaker
 from database import db, Film
 from raccomandazione.raccomandazione_collaborativa import raccomanda_film_per_utente  
 from core.community_structure.Genres_community_Structure import genera_immagine_community_generi
+from raccomandazione.raccomandazione_collaborativa_user import *
 
 
 
@@ -153,7 +154,8 @@ def user_page():
     raccomandazioni_attore = []
     raccomandazioni_film = []
     raccomandazioni_collaborative = []
-    raccomandazioni_ibrido = []  # nuova lista
+    raccomandazioni_user_based = [] 
+    raccomandazioni_ibrido = []  
 
     # Raccomandazioni per generi
     if user_data['preferiti']['generi']:
@@ -194,6 +196,20 @@ def user_page():
         print(f"Errore nella raccomandazione collaborativa: {e}")
         raccomandazioni_collaborative = []
 
+    
+    # Raccomandazioni user-based
+    try:
+        raccomandazioni_user_based = raccomanda_film_per_utente_user_based(user_id, top_n=50)
+        movie_ids = [movie_id for movie_id, _ in raccomandazioni_user_based]
+        film_oggetti = db.session.query(Film).filter(Film.movieId.in_(movie_ids)).all()
+        film_dict = {f.movieId: f for f in film_oggetti}
+        raccomandazioni_user_based = [film_dict[mid] for mid in movie_ids if mid in film_dict]
+    except Exception as e:
+        print(f"Errore nella raccomandazione user-based: {e}")
+        raccomandazioni_user_based = []
+
+
+
     # Raccomandazioni ibride
     try:
         raccomandazioni_ibrido = raccomanda_film_ibrido(user_id, db.session, alpha=0.5, top_n=50)
@@ -209,6 +225,7 @@ def user_page():
         film_raccomandati_attore=raccomandazioni_attore,
         film_raccomandati_film=raccomandazioni_film,
         film_raccomandati_collaborativi=raccomandazioni_collaborative,
+        film_raccomandati_user_based=raccomandazioni_user_based, 
         film_raccomandati_ibridi=raccomandazioni_ibrido,  # <--- passaggio dati alla view
     )
 
@@ -817,6 +834,63 @@ def raccomanda():
     # Ordina per score e limita a 50
     risultati = sorted(risultati, key=lambda x: x['score'], reverse=True)[:50]
     return jsonify(risultati)
+
+
+
+@app.route('/raccomanda_user_based', methods=['POST'])
+def raccomanda_user_based():
+    utente_id = request.form.get('utente_id')
+    if not utente_id:
+        return "utente_id mancante", 400
+
+    try:
+        utente_id = int(utente_id)
+    except ValueError:
+        return "utente_id non valido", 400
+
+    # Crea sessione
+    Session = sessionmaker(bind=db.engine)
+    session_db = Session()
+
+    # Richiama la funzione di raccomandazione (user-based)
+    try:
+        raccomandazioni = raccomanda_film_per_utente_user_based(utente_id)
+    except Exception as e:
+        return f"Errore durante la raccomandazione: {str(e)}", 500
+
+    if not raccomandazioni:
+        return "Nessuna raccomandazione trovata", 404
+
+    # Recupera i film dal database
+    movie_ids = [movie_id for movie_id, _ in raccomandazioni]
+    film_oggetti = session_db.query(Film).filter(Film.movieId.in_(movie_ids)).all()
+    film_dict = {film.movieId: film for film in film_oggetti}
+
+    # Prepara risposta
+    risultati = []
+    for movie_id, score in raccomandazioni:
+        film = film_dict.get(movie_id)
+        if not film:
+            continue
+
+        generi = ", ".join([g.nome for g in film.generi]) if film.generi else ""
+        descrizione_film = film.descrizione or film.descrizione_eng or "Descrizione mancante"
+
+        risultati.append({
+            'movieId': film.movieId,
+            'title': film.title,
+            'url': film.url,
+            'genres': generi,
+            'descrizione': descrizione_film,
+            'score': round(score, 3)
+        })
+
+    # Ordina per score e limita a 50
+    risultati = sorted(risultati, key=lambda x: x['score'], reverse=True)[:50]
+    return jsonify(risultati)
+
+
+
 
 
 #--------------RACCOMANDAZIONE IBRIDA------------------------------
